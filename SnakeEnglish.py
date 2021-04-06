@@ -1,6 +1,6 @@
 import tkinter as tk
 from operator import itemgetter
-import pickle
+import json
 from tkinter import ttk
 from tkinter.messagebox import askyesno
 import sys, time, random
@@ -8,25 +8,24 @@ import os
 from random import randrange
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 def Store():
+    try:
+        with open('highscore.txt', 'r') as f:
+            highscores = json.load(f)
+    except FileNotFoundError:
+        # If the file doesn't exist, use your default values
+        highscores = [
+            ]
+    
     playerName = input("what is your name? ")
     playerScore = int(input('Give me a score? '))
-
-    highscores = [
-        ('Luke', 0),
-        ('Dalip', 0),
-        ('Andrew', 0),
-    ]
-
+    
     highscores.append((playerName, playerScore))
     highscores = sorted(highscores, key = itemgetter(1), reverse = True)[:10]
-
-    with open('highscore.dat', 'wb') as f:
-        pickle.dump(highscores, f)
-
+    
+    with open('highscore.txt', 'w') as f:
+        json.dump(highscores, f)
+    
     highscores = []
-
-    with open('highscore.dat', 'rb') as f:
-        highscores = pickle.load(f)
 beta = input('Type Enter to continue')
 if beta == "Beta":
     Store()
