@@ -1,12 +1,36 @@
 import tkinter as tk
+from operator import itemgetter
+import pickle
 from tkinter import ttk
 from tkinter.messagebox import askyesno
 import sys, time, random
 import os
-import shelve
 from random import randrange
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
+def Store():
+    playerName = input("what is your name? ")
+    playerScore = int(input('Give me a score? '))
 
+    highscores = [
+        ('Luke', 0),
+        ('Dalip', 0),
+        ('Andrew', 0),
+    ]
+
+    highscores.append((playerName, playerScore))
+    highscores = sorted(highscores, key = itemgetter(1), reverse = True)[:10]
+
+    with open('highscore.dat', 'wb') as f:
+        pickle.dump(highscores, f)
+
+    highscores = []
+
+    with open('highscore.dat', 'rb') as f:
+        highscores = pickle.load(f)
+beta = input('Type Enter to continue')
+if beta == "Beta":
+    Store()
+    
 # create the root window
 root = tk.Tk()
 root.title('Projet')
@@ -15,7 +39,7 @@ root.geometry('300x150')
 # click event handler
 def confirm():
     answer = askyesno(title='Confimation',
-        message="AVANT DE LANCER CE PROJET, VEILLEZ ETRE SUR D'AVOIR INSTALLER CES LIBRARIES : Pip, Pygame, Pygame_menu")
+        message="BEFORE LUNCHING THIS PROJECT YOU NEED ALL OF THAT : Pip, Pygame, Pygame_menu. HAVE YOU GOT ALL OF THIS?")
     if answer:
         root.destroy()
 
@@ -75,21 +99,8 @@ def Pressound():
 def gameoversound():
     pygame.mixer.music.load('Assets/Gameover.ogg')
     pygame.mixer.music.play(1)
-def Store(file,filename,variable):
-    shfile = shelve.open(file)
-    file = ()
 
-    shfile[filename]= file
-    # In this step, we create a shelf file.
-    var = shelve.open(file, writeback = True)
-    var[file].append(variable)
-    print(var[file])
-    # to make our changes permanent, we use 
-    # synchronize function.
-    var.sync()
-    
-    # now, we simply close the file 'shelf_file'.
-    var.close()
+
 # -----------------------------------------------------------------------------
 # Constants and global variables
 # -----------------------------------------------------------------------------
@@ -180,12 +191,6 @@ def EnglishGame():
         game_over_rect.midtop = (frame_size_x/2, frame_size_y/4)
         game_window.fill(black)
         game_window.blit(game_over_surface, game_over_rect)
-        var = shelve.open("Score")
-        
-        #transformedscore = tuple(score)
-        highscore = tuple(score)
-        var.close()
-        print(highscore)
         show_score(0, red, 'times', 20)
         pygame.display.flip()
         time.sleep(5)
