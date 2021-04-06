@@ -89,7 +89,7 @@ else:
 os.environ['SDL_VIDEO_CENTERED'] = '1'
 surface = pygame.display.set_mode((600, 400))
 
-version='0.8.1 UNSTABLE'
+version='0.8.1 STABLE'
 
 # Initialise game window
 
