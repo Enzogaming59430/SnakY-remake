@@ -7,30 +7,23 @@ import sys, time, random
 import os
 from random import randrange
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
-def Store():
+def Store(filename, scorename, username):
     
     try:
-        with open('highscore.txt', 'r') as f:
+        with open(filename, 'r') as f:
             highscores = json.load(f)
     except FileNotFoundError:
         # If the file doesn't exist, use your default values
-        highscores = [
-            ]
-    
-    playerName = input("Nom : ")
-    playerScore = int(input('Score : '))
+        highscores = []
+    playerName = username
+    playerScore = int(scorename)
     
     highscores.append((playerName, playerScore))
     highscores = sorted(highscores, key = itemgetter(1), reverse = True)[:10]
     
-    with open('highscore.txt', 'w') as f:
+    with open(filename, 'w') as f:
         json.dump(highscores, f)
 beta = input('Want you to go in the beta program (Y/N): ')
-if beta == "Y" or "y":
-    print('PROGRAMME BETA ')
-    Store()
-else:  
-    print('PROGRAMME NORMAL')
     
 # create the root window
 root = tk.Tk()
