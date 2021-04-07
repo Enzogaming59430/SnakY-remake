@@ -8,6 +8,7 @@ import os
 from random import randrange
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 def Store():
+    
     try:
         with open('highscore.txt', 'r') as f:
             highscores = json.load(f)
@@ -16,19 +17,20 @@ def Store():
         highscores = [
             ]
     
-    playerName = input("what is your name? ")
-    playerScore = int(input('Give me a score? '))
+    playerName = input("Nom : ")
+    playerScore = int(input('Score : '))
     
     highscores.append((playerName, playerScore))
     highscores = sorted(highscores, key = itemgetter(1), reverse = True)[:10]
     
     with open('highscore.txt', 'w') as f:
         json.dump(highscores, f)
-    
-    highscores = []
-beta = input('Type Enter to continue')
-if beta == "Beta":
+beta = input('Want you to go in the beta program (Y/N): ')
+if beta == "Y" or "y":
+    print('PROGRAMME BETA ')
     Store()
+else:  
+    print('PROGRAMME NORMAL')
     
 # create the root window
 root = tk.Tk()
