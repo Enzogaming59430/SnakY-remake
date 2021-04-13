@@ -42,7 +42,7 @@ else:
 os.environ['SDL_VIDEO_CENTERED'] = '1'
 surface = pygame.display.set_mode((600, 400))
 
-version='1.1'
+version='0.9.1'
 serverip='http://15.236.97.173:1337/scores'
 # Initialise game window
 response = requests.get(url=serverip)
@@ -81,7 +81,7 @@ background_image = pygame_menu.baseimage.BaseImage(
 # Methods
 # -----------------------------------------------------------------------------
 def change_difficulty(value, difficulty):
-    
+
     """
     Change difficulty of the game.
 
@@ -137,11 +137,10 @@ def EnglishGame():
     
     # Game Over
     def game_over():
-        
         repr(score).encode('utf-8')
         pygame.mixer.music.stop()
         gameoversound()
-        my_font = pygame.font.SysFont('Assets\pixelart.ttf', 90)
+        my_font = pygame.font.SysFont('Pixel-Art Regular', 90)
         game_over_surface = my_font.render('Game over', True, white)
         game_over_rect = game_over_surface.get_rect()
         game_over_rect.midtop = (frame_size_x/2, frame_size_y/4)
@@ -150,7 +149,7 @@ def EnglishGame():
         show_score(0, red, 'times', 20)
         pygame.display.flip()
         time.sleep(5)
-        requests.post(url=serverip, json={"score": score, "name": username, "difficulty": DIFFICULTY})
+        requests.post(url=serverip, json={"score": score, "name": username, "difficulty": difficulty})
         mainEnglish()
     
     
@@ -391,6 +390,7 @@ def play_functionenglish(difficulty, font, test=False):
     assert isinstance(difficulty, (tuple, list))
     difficulty = difficulty[0]
     assert isinstance(difficulty, str)
+    
     # Define globals
     global DIFFICULTYGAME
     global main_menu
