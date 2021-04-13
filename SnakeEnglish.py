@@ -17,6 +17,7 @@ def usernamedefiner(value):
     username = value
     print('Username: {0}'.format(username)) 
     print('Value: {0}'.format(value))
+difficulty = 'EASY'
 # Difficulty settings
 # Easy      ->  10
 # Medium    ->  25
@@ -80,6 +81,7 @@ background_image = pygame_menu.baseimage.BaseImage(
 # Methods
 # -----------------------------------------------------------------------------
 def change_difficulty(value, difficulty):
+
     """
     Change difficulty of the game.
 
@@ -147,7 +149,7 @@ def EnglishGame():
         show_score(0, red, 'times', 20)
         pygame.display.flip()
         time.sleep(5)
-        requests.post(url=serverip, json={"score": score, "name": username})
+        requests.post(url=serverip, json={"score": score, "name": username, "difficulty": difficulty})
         mainEnglish()
     
     
@@ -385,21 +387,31 @@ def FrenchGame():
         # Refresh rate
         fps_controller.tick(DIFFICULTYGAME)
 def play_functionenglish(difficulty, font, test=False):
-    
     assert isinstance(difficulty, (tuple, list))
     difficulty = difficulty[0]
     assert isinstance(difficulty, str)
-
+    
     # Define globals
+    global DIFFICULTYGAME
     global main_menu
     global clock
     #print(DIFFICULTYGAME)
     if difficulty == 'EASY':
+        print(DIFFICULTYGAME)
+        print('Returned Easy')
         DIFFICULTYGAME = 10
+        print(DIFFICULTYGAME)
     elif difficulty == 'MEDIUM':
+        print(DIFFICULTYGAME)
+        print('Returned Medium')
         DIFFICULTYGAME = 25
+        print(DIFFICULTYGAME)
     elif difficulty == 'HARD':
+        print(DIFFICULTYGAME)
+        print('Returned Hard')
         DIFFICULTYGAME = 40
+        print(DIFFICULTYGAME)
+        
     else:
         raise Exception('Unknown difficulty {0}'.format(difficulty))
     print(DIFFICULTYGAME)
