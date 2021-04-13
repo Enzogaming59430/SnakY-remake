@@ -7,57 +7,16 @@ import sys, time, random
 import os
 from random import randrange
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
-def Store(filename, scorename, username):
-    
-    try:
-        with open(filename, 'r') as f:
-            highscores = json.load(f)
-    except FileNotFoundError:
-        # If the file doesn't exist, use your default values
-        highscores = []
-    playerName = username
-    playerScore = int(scorename)
-    
-    highscores.append((playerName, playerScore))
-    highscores = sorted(highscores, key = itemgetter(1), reverse = True)[:10]
-    
-    with open(filename, 'w') as f:
-        json.dump(highscores, f)
-beta = input('Want you to go in the beta program (Y/N): ')
-    
-# create the root window
-root = tk.Tk()
-root.title('Projet')
-root.geometry('300x150')
-
-# click event handler
-def confirm():
-    answer = askyesno(title='Confimation',
-        message="BEFORE LUNCHING THIS PROJECT YOU NEED ALL OF THAT : Pip, Pygame, Pygame_menu. HAVE YOU GOT ALL OF THIS?")
-    if answer:
-        root.destroy()
-
-    else:
-        print(f'[Error] Exited with error code (-1)')
-        sys.exit(-1)
-
-
-ttk.Button(
-    root,
-    text='Demarer',
-    command=confirm).pack(expand=True)
-
-
-# start the app
-root.mainloop()
-
-
-
-
-
+import requests
+username = "Unnamed"
 import pygame
 import pygame_menu
-
+def usernamedefiner(value):
+    global username
+    print('Userinput')
+    username = value
+    print('Username: {0}'.format(username)) 
+    print('Value: {0}'.format(value))
 # Difficulty settings
 # Easy      ->  10
 # Medium    ->  25
@@ -78,14 +37,14 @@ if check_errors[1] > 0:
     sys.exit(-1)
 else:
     print('[Client] Game successfully initialised')
-    print('[Client] Loading...')
-    print('[Pyverificator] AssertionError may cause the shutdown of the app  ')
+    print()
 os.environ['SDL_VIDEO_CENTERED'] = '1'
 surface = pygame.display.set_mode((600, 400))
 
-version='0.8.1 STABLE'
-
+version='0.9.1'
+serverip='http://15.236.97.173:1337/scores'
 # Initialise game window
+response = requests.get(url=serverip)
 
 def Pressound():
     pygame.mixer.music.load('Assets/Press.wav')
@@ -100,7 +59,7 @@ def gameoversound():
 # -----------------------------------------------------------------------------
 ABOUT = ['Version {0}'.format(version),
          'Author: @{0}'.format("Enzogaming59430"),
-         '',  # new line
+         '',  # new lineq
          'Email: {0}'.format('enzo_ignaes@hotmail.com')]
 DIFFICULTY = ['EASY']
 FPS = 60
@@ -188,6 +147,7 @@ def EnglishGame():
         show_score(0, red, 'times', 20)
         pygame.display.flip()
         time.sleep(5)
+        requests.post(url=serverip, json={"score": score, "name": username})
         mainEnglish()
     
     
@@ -497,7 +457,7 @@ def mainEnglish(test=False):
 
     # Create pygame screen and objects
     surface = pygame.display.set_mode(WINDOW_SIZE)
-    pygame.display.set_caption('Pygame')
+    pygame.display.set_caption('Snake game')
     clock = pygame.time.Clock()
 
     # -------------------------------------------------------------------------
@@ -526,7 +486,12 @@ def mainEnglish(test=False):
                          play_functionenglish,
                          DIFFICULTY,
                          pygame.font.Font(pygame_menu.font.FONT_FRANCHISE, 30))
-                         
+    play_menu.add_text_input(
+        'Username: ',
+        default='John',
+        onreturn=usernamedefiner,
+        textinput_id='Username'
+    )
     play_menu.add_selector('Select difficulty ',
                            [('1 - Easy', 'EASY'),
                             ('2 - Medium', 'MEDIUM'),
@@ -629,7 +594,7 @@ def mainFrench(test=False):
 
     # Create pygame screen and objects
     surface = pygame.display.set_mode(WINDOW_SIZE)
-    pygame.display.set_caption('Pygame')
+    pygame.display.set_caption('Serpant')
     clock = pygame.time.Clock()
 
     # -------------------------------------------------------------------------
@@ -638,7 +603,7 @@ def mainFrench(test=False):
     play_menu = pygame_menu.Menu(
         height=WINDOW_SIZE[1] * 0.7,
         onclose=pygame_menu.events.DISABLE_CLOSE,
-        title='Menu du jeu',
+        title='Menu de jeu',
         width=WINDOW_SIZE[0] * 0.75
     )
 
@@ -647,24 +612,29 @@ def mainFrench(test=False):
     play_submenu = pygame_menu.Menu(
         height=WINDOW_SIZE[1] * 0.5,
         theme=submenu_theme,
-        title='Menu sub',
+        title='Menu test',
         width=WINDOW_SIZE[0] * 0.7
     )
     for i in range(30):
-        play_submenu.add_button('test  {0}'.format(i), pygame_menu.events.BACK)
+        play_submenu.add_button('Test retour {0}'.format(i), pygame_menu.events.BACK)
     play_submenu.add_button('Retourner au menu principal', pygame_menu.events.RESET)
-
+    Pressound()
     play_menu.add_button('Demarer',  # When pressing return -> play(DIFFICULTY[0], font)
-                         play_functionfrench,
+                         play_functionenglish,
                          DIFFICULTY,
                          pygame.font.Font(pygame_menu.font.FONT_FRANCHISE, 30))
-    play_menu.add_selector('Select difficulty ',
+    play_menu.add_text_input(
+        "Nom d'utilisateur: ",
+        default='John',
+        onreturn=usernamedefiner,
+        textinput_id='Username'
+    )
+    play_menu.add_selector('Difficulté ',
                            [('1 - Facile', 'EASY'),
                             ('2 - Moyen', 'MEDIUM'),
                             ('3 - Difficile', 'HARD')],
                            onchange=change_difficulty,
                            selector_id='select_difficulty')
-    
     play_menu.add_button('Test menu', play_submenu)
     play_menu.add_button('Retourner au menu principal', pygame_menu.events.BACK)
 
@@ -678,14 +648,15 @@ def mainFrench(test=False):
         height=WINDOW_SIZE[1] * 0.6,
         onclose=pygame_menu.events.DISABLE_CLOSE,
         theme=about_theme,
-        title='About',
+        title='A propos',
         width=WINDOW_SIZE[0] * 0.6
     )
 
     for m in ABOUT:
         about_menu.add_label(m, align=pygame_menu.locals.ALIGN_LEFT, font_size=20)
+    Pressound()
     about_menu.add_label('')
-    about_menu.add_button('Retourner au menu menu', pygame_menu.events.BACK)
+    about_menu.add_button('Retourner au menu', pygame_menu.events.BACK)
 
     # -------------------------------------------------------------------------
     # Create menus: Main
@@ -697,7 +668,7 @@ def mainFrench(test=False):
         height=WINDOW_SIZE[1] * 0.6,
         onclose=pygame_menu.events.DISABLE_CLOSE,
         theme=main_theme,
-        title='Main Menu',
+        title='Menu Principal',
         width=WINDOW_SIZE[0] * 0.6
     )
 
@@ -737,7 +708,6 @@ def mainFrench(test=False):
         # At first loop returns
         if test:
             break
-
 menu = pygame_menu.Menu(
     height=400,
     theme=pygame_menu.themes.THEME_DARK,
@@ -748,7 +718,7 @@ menu = pygame_menu.Menu(
 menu.add_button('English', mainEnglish)
 menu.add_button('Français', mainFrench)
 menu.add_button('Quit', pygame_menu.events.EXIT)
-
+pygame.display.set_caption('Selecting language')
 
 
 surface = pygame.display.set_mode((600, 400))
