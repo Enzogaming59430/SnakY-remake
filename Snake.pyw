@@ -55,7 +55,7 @@ else:
 os.environ['SDL_VIDEO_CENTERED'] = '1'
 surface = pygame.display.set_mode((600, 400))
 
-version='1.2'
+version='1.3'
 serverip='http://15.236.97.173:1337/scores'
 # Initialise game window
 
