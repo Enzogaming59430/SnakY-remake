@@ -25,7 +25,7 @@ difficulty = 'EASY'
 # Harder    ->  60
 # Impossible->  120
 DIFFICULTYGAME = 25
-
+ONLINEMODE = True
 # Window size
 frame_size_x = 800
 frame_size_y = 600
@@ -42,7 +42,7 @@ else:
 os.environ['SDL_VIDEO_CENTERED'] = '1'
 surface = pygame.display.set_mode((600, 400))
 
-version='1.1'
+version='1.2'
 serverip='http://15.236.97.173:1337/scores'
 # Initialise game window
 response = requests.get(url=serverip)
@@ -96,7 +96,23 @@ def change_difficulty(value, difficulty):
     print('Selected difficulty: "{0}" ({1}) at index {2}'.format(selected, difficulty, index))
     DIFFICULTY[0] = difficulty
 
+def change_online(value, onlinemode):
+    global ONLINEMODE
+    """
+    Change difficulty of the game.
 
+    :param value: Tuple containing the data of the selected object
+    :type value: tuple
+    :param difficulty: Optional parameter passed as argument to add_selector
+    :type difficulty: str
+    :return: None
+    """
+    if onlinemode == 'first':
+        ONLINEMODE = True
+    elif onlinemode == 'last':
+        ONLINEMODE = False
+    selected, index = value
+    print('Selected online: "{0}" ({1}) at index {2}'.format(selected, onlinemode, index))
 def random_color():
     """
     Return a random color.
@@ -150,10 +166,20 @@ def EnglishGame():
         show_score(0, red, 'times', 20)
         pygame.display.flip()
         time.sleep(5)
-        print(score)
-        print(username)
-        print(DIFFICULTY)
-        requests.post(url=serverip, json={"score": score, "name": username, "difficulty": DIFFICULTY})
+        if ONLINEMODE == True:
+            print(score)
+            print(username)
+            print(DIFFICULTY)
+            requests.post(url=serverip, json={"score": score, "name": username, "difficulty": DIFFICULTY})
+        elif ONLINEMODE == False:
+            json_obj = {}
+            json_obj['Score'] = []
+            json_obj['Score'].append({
+                'Username' : username,
+                'Score' : score
+                })
+            with open('Scores.json','w') as jsonFile:
+                json.dump(json_obj, jsonFile)
         mainEnglish()
     
     
@@ -530,7 +556,11 @@ def mainEnglish(test=False):
                             ('3 - Hard', 'HARD')],
                            onchange=change_difficulty,
                            selector_id='select_difficulty')
-
+    play_menu.add_selector('Online',
+                           [('True', 'first'),
+                            ('False', 'last')],
+                           onchange=change_online,
+                           selector_id='online_mode')
     play_menu.add_button('Return to main menu', pygame_menu.events.BACK)
 
     # -------------------------------------------------------------------------

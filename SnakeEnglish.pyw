@@ -42,7 +42,7 @@ else:
 os.environ['SDL_VIDEO_CENTERED'] = '1'
 surface = pygame.display.set_mode((600, 400))
 
-version='0.9.1'
+version='1.1'
 serverip='http://15.236.97.173:1337/scores'
 # Initialise game window
 response = requests.get(url=serverip)
@@ -81,7 +81,7 @@ background_image = pygame_menu.baseimage.BaseImage(
 # Methods
 # -----------------------------------------------------------------------------
 def change_difficulty(value, difficulty):
-
+    
     """
     Change difficulty of the game.
 
@@ -137,10 +137,11 @@ def EnglishGame():
     
     # Game Over
     def game_over():
+        
         repr(score).encode('utf-8')
         pygame.mixer.music.stop()
         gameoversound()
-        my_font = pygame.font.SysFont('Pixel-Art Regular', 90)
+        my_font = pygame.font.SysFont('Assets\pixelart.ttf', 90)
         game_over_surface = my_font.render('Game over', True, white)
         game_over_rect = game_over_surface.get_rect()
         game_over_rect.midtop = (frame_size_x/2, frame_size_y/4)
@@ -149,7 +150,10 @@ def EnglishGame():
         show_score(0, red, 'times', 20)
         pygame.display.flip()
         time.sleep(5)
-        requests.post(url=serverip, json={"score": score, "name": username, "difficulty": difficulty})
+        print(score)
+        print(username)
+        print(DIFFICULTY)
+        requests.post(url=serverip, json={"score": score, "name": username, "difficulty": DIFFICULTY})
         mainEnglish()
     
     
@@ -250,7 +254,7 @@ def EnglishGame():
         fps_controller.tick(DIFFICULTYGAME)
 
 def FrenchGame():
-    Pressound()
+    pygame.mixer.init()
     game_window = pygame.display.set_mode((frame_size_x, frame_size_y))
     
     # Colors (R, G, B)
@@ -276,19 +280,27 @@ def FrenchGame():
     change_to = direction
     
     score = 0
-    
+
     
     # Game Over
     def game_over():
-        my_font = pygame.font.SysFont('Pixel-Art Regular', 90)
+        
+        repr(score).encode('utf-8')
+        pygame.mixer.music.stop()
+        gameoversound()
+        my_font = pygame.font.SysFont('Assets\pixelart.ttf', 90)
         game_over_surface = my_font.render('Game over', True, white)
         game_over_rect = game_over_surface.get_rect()
         game_over_rect.midtop = (frame_size_x/2, frame_size_y/4)
         game_window.fill(black)
         game_window.blit(game_over_surface, game_over_rect)
-        show_score(0, red, 'times', 20)
+        show_score(0, red, 'fois', 20)
         pygame.display.flip()
-        time.sleep(3)
+        time.sleep(5)
+        print(score)
+        print(username)
+        print(DIFFICULTY)
+        requests.post(url=serverip, json={"score": score, "name": username, "difficulty": DIFFICULTY})
         mainEnglish()
     
     
@@ -305,6 +317,8 @@ def FrenchGame():
         # pygame.display.flip()
     
     
+    pygame.mixer.music.load('Assets/Whitty.wav')
+    pygame.mixer.music.play(-1)
     # Main logic
     while True:
         for event in pygame.event.get():
@@ -380,7 +394,6 @@ def FrenchGame():
         for block in snake_body[1:]:
             if snake_pos[0] == block[0] and snake_pos[1] == block[1]:
                 game_over()
-    
         show_score(1, white, 'consolas', 20)
         # Refresh game screen
         pygame.display.update()
@@ -390,7 +403,6 @@ def play_functionenglish(difficulty, font, test=False):
     assert isinstance(difficulty, (tuple, list))
     difficulty = difficulty[0]
     assert isinstance(difficulty, str)
-    
     # Define globals
     global DIFFICULTYGAME
     global main_menu
@@ -417,26 +429,34 @@ def play_functionenglish(difficulty, font, test=False):
     print(DIFFICULTYGAME)
     EnglishGame()
 def play_functionfrench(difficulty, font, test=False):
-    
     assert isinstance(difficulty, (tuple, list))
     difficulty = difficulty[0]
     assert isinstance(difficulty, str)
-
     # Define globals
+    global DIFFICULTYGAME
     global main_menu
     global clock
-
+    #print(DIFFICULTYGAME)
     if difficulty == 'EASY':
+        print(DIFFICULTYGAME)
+        print('Returned Easy')
         DIFFICULTYGAME = 10
+        print(DIFFICULTYGAME)
     elif difficulty == 'MEDIUM':
+        print(DIFFICULTYGAME)
+        print('Returned Medium')
         DIFFICULTYGAME = 25
+        print(DIFFICULTYGAME)
     elif difficulty == 'HARD':
+        print(DIFFICULTYGAME)
+        print('Returned Hard')
         DIFFICULTYGAME = 40
+        print(DIFFICULTYGAME)
+        
     else:
         raise Exception('Unknown difficulty {0}'.format(difficulty))
+    print(DIFFICULTYGAME)
     FrenchGame()
-
-
 def main_background():
     """
     Function used by menus, draw on background while menu is active.
@@ -510,7 +530,7 @@ def mainEnglish(test=False):
                             ('3 - Hard', 'HARD')],
                            onchange=change_difficulty,
                            selector_id='select_difficulty')
-    play_menu.add_button('Another menu', play_submenu)
+
     play_menu.add_button('Return to main menu', pygame_menu.events.BACK)
 
     # -------------------------------------------------------------------------
@@ -615,7 +635,7 @@ def mainFrench(test=False):
     play_menu = pygame_menu.Menu(
         height=WINDOW_SIZE[1] * 0.7,
         onclose=pygame_menu.events.DISABLE_CLOSE,
-        title='Menu de jeu',
+        title='Menu du jeu',
         width=WINDOW_SIZE[0] * 0.75
     )
 
@@ -624,12 +644,12 @@ def mainFrench(test=False):
     play_submenu = pygame_menu.Menu(
         height=WINDOW_SIZE[1] * 0.5,
         theme=submenu_theme,
-        title='Menu test',
+        title='Menu de test',
         width=WINDOW_SIZE[0] * 0.7
     )
     for i in range(30):
-        play_submenu.add_button('Test retour {0}'.format(i), pygame_menu.events.BACK)
-    play_submenu.add_button('Retourner au menu principal', pygame_menu.events.RESET)
+        play_submenu.add_button('Retour {0}'.format(i), pygame_menu.events.BACK)
+    play_submenu.add_button('Retourner au menu pricipal', pygame_menu.events.RESET)
     Pressound()
     play_menu.add_button('Demarer',  # When pressing return -> play(DIFFICULTY[0], font)
                          play_functionenglish,
@@ -641,14 +661,13 @@ def mainFrench(test=False):
         onreturn=usernamedefiner,
         textinput_id='Username'
     )
-    play_menu.add_selector('Difficulté ',
+    play_menu.add_selector('Selectionnez la difficulé ',
                            [('1 - Facile', 'EASY'),
                             ('2 - Moyen', 'MEDIUM'),
                             ('3 - Difficile', 'HARD')],
                            onchange=change_difficulty,
                            selector_id='select_difficulty')
-    play_menu.add_button('Test menu', play_submenu)
-    play_menu.add_button('Retourner au menu principal', pygame_menu.events.BACK)
+    play_menu.add_button('Return to main menu', pygame_menu.events.BACK)
 
     # -------------------------------------------------------------------------
     # Create menus:About
