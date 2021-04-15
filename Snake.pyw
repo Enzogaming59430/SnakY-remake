@@ -8,6 +8,19 @@ import os
 from random import randrange
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 import requests
+import urllib.request
+def connect(host='http://15.236.97.173:1337/scores'):
+    try:
+        urllib.request.urlopen(host) #Python 3.x
+        return True
+    except:
+        return False
+# test
+print('Server responding' if connect() else 'Server not responding')
+if connect():
+    ONLINEMODE = True
+else:
+    ONLINEMODE = False
 username = "Unnamed"
 import pygame
 import pygame_menu
@@ -25,7 +38,7 @@ difficulty = 'EASY'
 # Harder    ->  60
 # Impossible->  120
 DIFFICULTYGAME = 25
-ONLINEMODE = True
+
 # Window size
 frame_size_x = 800
 frame_size_y = 600
@@ -45,7 +58,7 @@ surface = pygame.display.set_mode((600, 400))
 version='1.2'
 serverip='http://15.236.97.173:1337/scores'
 # Initialise game window
-response = requests.get(url=serverip)
+
 
 def Pressound():
     pygame.mixer.music.load('Assets/Press.wav')
@@ -167,14 +180,15 @@ def EnglishGame():
         pygame.display.flip()
         time.sleep(5)
         if ONLINEMODE == True:
+            response = requests.get(url=serverip + '?_sort=score:desc')
             print(score)
             print(username)
             print(DIFFICULTY)
             requests.post(url=serverip, json={"score": score, "name": username, "difficulty": DIFFICULTY})
         elif ONLINEMODE == False:
             json_obj = {}
-            json_obj['Score'] = []
-            json_obj['Score'].append({
+            json_obj['json'] = []
+            json_obj['json'].append({
                 'Username' : username,
                 'Score' : score
                 })
@@ -323,10 +337,21 @@ def FrenchGame():
         show_score(0, red, 'fois', 20)
         pygame.display.flip()
         time.sleep(5)
-        print(score)
-        print(username)
-        print(DIFFICULTY)
-        requests.post(url=serverip, json={"score": score, "name": username, "difficulty": DIFFICULTY})
+        if ONLINEMODE == True:
+            response = requests.get(url=serverip + '?_sort=score:desc')
+            print(score)
+            print(username)
+            print(DIFFICULTY)
+            requests.post(url=serverip, json={"score": score, "name": username, "difficulty": DIFFICULTY})
+        elif ONLINEMODE == False:
+            json_obj = {}
+            json_obj['json'] = []
+            json_obj['json'].append({
+                'Username' : username,
+                'Score' : score
+                })
+            with open('Scores.json','w') as jsonFile:
+                json.dump(json_obj, jsonFile)
         mainEnglish()
     
     
@@ -425,6 +450,7 @@ def FrenchGame():
         pygame.display.update()
         # Refresh rate
         fps_controller.tick(DIFFICULTYGAME)
+
 def play_functionenglish(difficulty, font, test=False):
     assert isinstance(difficulty, (tuple, list))
     difficulty = difficulty[0]
@@ -490,17 +516,7 @@ def main_background():
     :return: None
     """
     background_image.draw(surface)
-
-
 def mainEnglish(test=False):
-    """
-    Main program.
-
-    :param test: Indicate function is being tested
-    :type test: bool
-    :return: None
-    """
-
     # -------------------------------------------------------------------------
     # Globals
     # -------------------------------------------------------------------------
@@ -633,15 +649,8 @@ def mainEnglish(test=False):
         # At first loop returns
         if test:
             break
+        
 def mainFrench(test=False):
-    """
-    Main program.
-
-    :param test: Indicate function is being tested
-    :type test: bool
-    :return: None
-    """
-
     # -------------------------------------------------------------------------
     # Globals
     # -------------------------------------------------------------------------
@@ -656,7 +665,7 @@ def mainFrench(test=False):
 
     # Create pygame screen and objects
     surface = pygame.display.set_mode(WINDOW_SIZE)
-    pygame.display.set_caption('Serpant')
+    pygame.display.set_caption('SERPANT (tres original)')
     clock = pygame.time.Clock()
 
     # -------------------------------------------------------------------------
@@ -674,29 +683,34 @@ def mainFrench(test=False):
     play_submenu = pygame_menu.Menu(
         height=WINDOW_SIZE[1] * 0.5,
         theme=submenu_theme,
-        title='Menu de test',
+        title='Submenu',
         width=WINDOW_SIZE[0] * 0.7
     )
     for i in range(30):
-        play_submenu.add_button('Retour {0}'.format(i), pygame_menu.events.BACK)
+        play_submenu.add_button('Back {0}'.format(i), pygame_menu.events.BACK)
     play_submenu.add_button('Retourner au menu pricipal', pygame_menu.events.RESET)
     Pressound()
-    play_menu.add_button('Demarer',  # When pressing return -> play(DIFFICULTY[0], font)
+    play_menu.add_button('Jouer',  # When pressing return -> play(DIFFICULTY[0], font)
                          play_functionenglish,
                          DIFFICULTY,
                          pygame.font.Font(pygame_menu.font.FONT_FRANCHISE, 30))
     play_menu.add_text_input(
         "Nom d'utilisateur: ",
-        default='John',
+        default='UwU',
         onreturn=usernamedefiner,
         textinput_id='Username'
     )
-    play_menu.add_selector('Selectionnez la difficulé ',
+    play_menu.add_selector('Select difficulty ',
                            [('1 - Facile', 'EASY'),
                             ('2 - Moyen', 'MEDIUM'),
                             ('3 - Difficile', 'HARD')],
                            onchange=change_difficulty,
                            selector_id='select_difficulty')
+    play_menu.add_selector('Online ',
+                           [('Vrai', 'first'),
+                            ('False', 'last')],
+                           onchange=change_online,
+                           selector_id='online_mode')
     play_menu.add_button('Return to main menu', pygame_menu.events.BACK)
 
     # -------------------------------------------------------------------------
@@ -717,7 +731,7 @@ def mainFrench(test=False):
         about_menu.add_label(m, align=pygame_menu.locals.ALIGN_LEFT, font_size=20)
     Pressound()
     about_menu.add_label('')
-    about_menu.add_button('Retourner au menu', pygame_menu.events.BACK)
+    about_menu.add_button('retourner au menu', pygame_menu.events.BACK)
 
     # -------------------------------------------------------------------------
     # Create menus: Main
@@ -729,7 +743,7 @@ def mainFrench(test=False):
         height=WINDOW_SIZE[1] * 0.6,
         onclose=pygame_menu.events.DISABLE_CLOSE,
         theme=main_theme,
-        title='Menu Principal',
+        title='Menu pricipal',
         width=WINDOW_SIZE[0] * 0.6
     )
 
@@ -775,9 +789,11 @@ menu = pygame_menu.Menu(
     title='Welcome',
     width=600
 )
-
+# def mainSecret():
+#     print()
 menu.add_button('English', mainEnglish)
 menu.add_button('Français', mainFrench)
+# menu.add_button('VARIABLES', mainSecret)
 menu.add_button('Quit', pygame_menu.events.EXIT)
 pygame.display.set_caption('Selecting language')
 
